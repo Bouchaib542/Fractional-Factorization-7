@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Guided Fractional Biprime Factorization</title>
+    <link rel="stylesheet" href="style.css">
+    <script>
+        function isPrime(n) {
+            if (n <= 1n) return false;
+            if (n <= 3n) return true;
+            if (n % 2n === 0n || n % 3n === 0n) return false;
+            for (let i = 5n; i * i <= n; i += 6n) {
+                if (n % i === 0n || n % (i + 2n) === 0n) return false;
+            }
+            return true;
+        }
+
+        function guidedFractionalFactorization() {
+            const input = document.getElementById("numberInput").value.trim();
+            const output = document.getElementById("output");
+            output.innerHTML = "";
+
+            try {
+                const O = BigInt(input);
+                const denominators = [
+                    { d: 0.25, pow: 2n },
+                    { d: 0.125, pow: 3n },
+                    { d: 0.0625, pow: 4n },
+                    { d: 0.03125, pow: 5n }
+                ];
+
+                for (let { d, pow } of denominators) {
+                    const divisor = BigInt(Math.round(Number(O) * d));
+                    if (divisor === 0n) continue;
+
+                    const quotient = O * BigInt(10 ** 5) / BigInt(Math.round(d * 10 ** 5));
+                    if (quotient % (1n << pow) === 0n) {
+                        const factor = quotient / (1n << pow);
+                        const cofactor = O / factor;
+
+                        if (O % factor === 0n && isPrime(factor) && isPrime(cofactor)) {
+                            output.innerHTML = `<p>✅ Prime factors found: <strong>${factor.toString()}</strong> × <strong>${cofactor.toString()}</strong></p>`;
+                            return;
+                        }
+                    }
+                }
+
+                output.innerHTML = "<p>❌ No prime factor found using guided fractional method.</p>";
+            } catch {
+                output.innerHTML = "<p>⚠️ Invalid input. Please enter a valid odd number.</p>";
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Guided Fractional Biprime Factorization</h1>
+        <p>Enter a biprime number (product of two primes):</p>
+        <input type="text" id="numberInput" placeholder="Enter biprime (e.g. 899)">
+        <button onclick="guidedFractionalFactorization()">Factorize</button>
+        <div id="output"></div>
+        <p class="footer">Developed by Bahbouhi Bouchaib</p>
+    </div>
+</body>
+</html>

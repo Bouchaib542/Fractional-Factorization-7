@@ -1,65 +1,60 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Guided Fractional Biprime Factorization</title>
-    <link rel="stylesheet" href="style.css">
-    <script>
-        function isPrime(n) {
-            if (n <= 1n) return false;
-            if (n <= 3n) return true;
-            if (n % 2n === 0n || n % 3n === 0n) return false;
-            for (let i = 5n; i * i <= n; i += 6n) {
-                if (n % i === 0n || n % (i + 2n) === 0n) return false;
-            }
-            return true;
-        }
-
-        function guidedFractionalFactorization() {
-            const input = document.getElementById("numberInput").value.trim();
-            const output = document.getElementById("output");
-            output.innerHTML = "";
-
-            try {
-                const O = BigInt(input);
-                const denominators = [
-                    { d: 0.25, pow: 2n },
-                    { d: 0.125, pow: 3n },
-                    { d: 0.0625, pow: 4n },
-                    { d: 0.03125, pow: 5n }
-                ];
-
-                for (let { d, pow } of denominators) {
-                    const divisor = BigInt(Math.round(Number(O) * d));
-                    if (divisor === 0n) continue;
-
-                    const quotient = O * BigInt(10 ** 5) / BigInt(Math.round(d * 10 ** 5));
-                    if (quotient % (1n << pow) === 0n) {
-                        const factor = quotient / (1n << pow);
-                        const cofactor = O / factor;
-
-                        if (O % factor === 0n && isPrime(factor) && isPrime(cofactor)) {
-                            output.innerHTML = `<p>✅ Prime factors found: <strong>${factor.toString()}</strong> × <strong>${cofactor.toString()}</strong></p>`;
-                            return;
-                        }
-                    }
-                }
-
-                output.innerHTML = "<p>❌ No prime factor found using guided fractional method.</p>";
-            } catch {
-                output.innerHTML = "<p>⚠️ Invalid input. Please enter a valid odd number.</p>";
-            }
-        }
-    </script>
+  <meta charset="UTF-8">
+  <title>Fractional Biprime Factorization</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 2em;
+    }
+    input, button {
+      padding: 0.5em;
+      font-size: 1em;
+    }
+    #result {
+      margin-top: 1.5em;
+      font-weight: bold;
+      color: darkgreen;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Guided Fractional Biprime Factorization</h1>
-        <p>Enter a biprime number (product of two primes):</p>
-        <input type="text" id="numberInput" placeholder="Enter biprime (e.g. 899)">
-        <button onclick="guidedFractionalFactorization()">Factorize</button>
-        <div id="output"></div>
-        <p class="footer">Developed by Bahbouhi Bouchaib</p>
-    </div>
+  <h1>Fractional Biprime Factorization</h1>
+  <p>Enter a biprime number (product of two primes):</p>
+  <input type="text" id="inputNumber" placeholder="Enter biprime (e.g. 323)">
+  <button onclick="factorize()">Find Prime Factors</button>
+  <div id="result"></div>
+
+  <script>
+    function factorize() {
+      const input = document.getElementById("inputNumber").value.trim();
+      const number = BigInt(input);
+      const resultDiv = document.getElementById("result");
+      const fractions = [
+        0.25, 0.75,
+        0.125, 0.875,
+        0.0625, 0.9375,
+        0.03125, 0.96875,
+        0.015625, 0.984375
+      ];
+
+      for (let f of fractions) {
+        const approx = number * BigInt(Math.round(f * 1e6))n / 1_000_000n;
+        if (approx * 4n === number || approx * 8n === number || approx * 16n === number || approx * 32n === number) continue;
+        const candidate = number / approx;
+        if (candidate % 1n !== 0n) continue;
+        const factor1 = candidate / 2n;
+        const factor2 = number / factor1;
+        if (factor1 * factor2 === number) {
+          resultDiv.textContent = `Factors found: ${factor1} × ${factor2}`;
+          return;
+        }
+      }
+
+      resultDiv.textContent = "No prime factors found using fractional method.";
+    }
+  </script>
 </body>
 </html>
